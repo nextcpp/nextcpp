@@ -1,0 +1,180 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 26,
+    "patch": 3
+  },
+
+  "configurePresets": [
+    {
+      "name": "msvc-base",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "VCPKG_MANIFEST_MODE": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "BUILD_SAMPLES": "ON",
+        "ENABLE_TESTING": "ON",
+        "ENABLE_WARNINGS": "ON",
+        "ENABLE_WARNINGS_AS_ERRORS": "ON",
+        "ENABLE_CLANG_FORMAT": "ON",
+        "ENABLE_CLANG_TIDY": "ON",
+        "ENABLE_CMAKE_FORMAT": "ON",
+        "ENABLE_LTO": "ON",
+        "ENABLE_COVERAGE": "OFF",
+        "ENABLE_SANITIZE_ADDR": "OFF",
+        "ENABLE_SANITIZE_UNDEF": "OFF"
+      }
+    },
+    {
+      "name": "windows-debug-config",
+      "displayName": "WinDebug",
+      "inherits": "msvc-base",
+      "binaryDir": "${sourceDir}/build",
+      "installDir": "${sourceDir}/install",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-release-config",
+      "displayName": "WinRelease",
+      "inherits": "msvc-base",
+      "binaryDir": "${sourceDir}/build",
+      "installDir": "${sourceDir}/install",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-debug-build",
+      "displayName": "WinDebug",
+      "configurePreset": "windows-debug-config",
+      "configuration": "Debug"
+    },
+    {
+      "name": "windows-release-build",
+      "displayName": "WinRelease",
+      "configurePreset": "windows-release-config",
+      "configuration": "Release"
+    }
+  ],
+
+  "testPresets": [
+    {
+      "name": "windows-release-test",
+      "configurePreset": "windows-release-config",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true,
+        "verbosity": "verbose"
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ],
+
+  "packagePresets": [
+    {
+      "name": "tgz-package",
+      "configurePreset": "windows-release-config",
+      "generators": [
+        "TGZ"
+      ]
+    }
+  ],
+
+  "workflowPresets": [
+    {
+      "name": "windows-config-build-test-package-wf",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-release-config"
+        },
+        {
+          "type": "build",
+          "name": "windows-release-build"
+        },
+        {
+          "type": "test",
+          "name": "windows-release-test"
+        },
+        {
+          "type": "package",
+          "name": "tgz-package"
+        }
+      ]
+    },
+    {
+      "name": "windows-config-build-test-wf",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-release-config"
+        },
+        {
+          "type": "build",
+          "name": "windows-release-build"
+        },
+        {
+          "type": "test",
+          "name": "windows-release-test"
+        }
+      ]
+    },
+    {
+      "name": "windows-config-build-wf",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-release-config"
+        },
+        {
+          "type": "build",
+          "name": "windows-release-build"
+        }
+      ]
+    },
+    {
+      "name": "windows-config-build-inDebug-wf",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-debug-config"
+        },
+        {
+          "type": "build",
+          "name": "windows-debug-build"
+        }
+      ]
+    },
+    {
+      "name": "windows-config-wf",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-release-config"
+        }
+      ]
+    }
+  ]
+}

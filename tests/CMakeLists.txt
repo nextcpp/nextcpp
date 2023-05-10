@@ -1,0 +1,6 @@
+if(ENABLE_TESTING)
+	enable_testing()
+	include(GoogleTest)
+	find_package(GTest CONFIG REQUIRED)
+	add_subdirectory(utils)
+endif()
